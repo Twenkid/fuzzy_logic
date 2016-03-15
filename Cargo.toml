@@ -1,0 +1,7 @@
+[package]
+name = "fuzzy_logic"
+version = "0.1.0"
+authors = ["Lutfullin Bulat <lb6557@gmail.com>"]
+
+[dependencies]
+ordered-float = {version = "0.1.0", git = "https://github.com/AerialX/rust-ordered-float.git", rev="fa23d3d"}
