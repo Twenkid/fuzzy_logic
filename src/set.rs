@@ -8,25 +8,46 @@ use membership::MembershipFunction;
 use self::ordered_float::OrderedFloat;
 
 pub struct Set {
-    name: String,
-    membership: Box<MembershipFunction>,
-    cache: HashMap<OrderedFloat<f32>, f32>,
+    pub name: String,
+    pub membership: Option<Box<MembershipFunction>>,
+    pub cache: HashMap<OrderedFloat<f32>, f32>,
 }
 
 impl Set {
-    pub fn add_if_member(&mut self, x: f32) -> f32 {
-        let mem = self.check_membership(x);
-        if mem > 0.0 {
-            let ordered = OrderedFloat(x);
-            if let None = self.cache.get(&ordered) {
-                self.cache.insert(ordered, mem);
-            }
+    pub fn new_with_mem(name: String, membership: Box<MembershipFunction>) -> Set {
+        Set {
+            name: name,
+            membership: Some(membership),
+            cache: HashMap::new(),
         }
-        mem
+    }
+    pub fn new_with_domain(name: String, cache: HashMap<OrderedFloat<f32>, f32>) -> Set {
+        Set {
+            name: name,
+            membership: None,
+            cache: cache,
+        }
     }
 
-    pub fn check_membership(&self, x: f32) -> f32 {
-        (*self.membership)(x)
+    pub fn new_empty() -> Set {
+        Set::new_with_domain("Empty".to_string(), HashMap::new())
+    }
+
+    pub fn check(&mut self, x: f32) -> f32 {
+        let ordered = OrderedFloat(x);
+        let func = self.membership.as_ref();
+        let mut mem = 0.0;
+        {
+            let value = self.cache.entry(ordered).or_insert(match func {
+                Some(f) => f(x),
+                None => unreachable!(),
+            });
+            mem = *value;
+        }
+        if mem <= 0.0 {
+            self.cache.remove(&ordered);
+        }
+        mem
     }
 }
 
@@ -44,7 +65,7 @@ impl fmt::Debug for Set {
 pub struct UniversalSet {
     name: String,
     domain: Vec<f32>,
-    sets: Vec<Box<Set>>,
+    sets: HashMap<String, Set>,
 }
 
 impl UniversalSet {
@@ -52,7 +73,7 @@ impl UniversalSet {
         UniversalSet {
             name: name,
             domain: Vec::new(),
-            sets: Vec::new(),
+            sets: HashMap::new(),
         }
     }
 
@@ -60,20 +81,29 @@ impl UniversalSet {
         self.domain = domain;
     }
 
-    pub fn add_set(&mut self, name: String, membership: Box<MembershipFunction>) {
-        self.sets.push(Box::new(Set {
+    pub fn create_set(&mut self, name: String, membership: Box<MembershipFunction>) {
+        self.sets.entry(name.clone()).or_insert(Set {
             name: name,
-            membership: membership,
+            membership: Some(membership),
             cache: HashMap::new(),
-        }));
+        });
     }
 
     pub fn memberships(&mut self, x: f32) -> HashMap<String, f32> {
-        let mut result = HashMap::new();
-        for set in &mut self.sets {
-            let mem = set.add_if_member(x);
-            result.insert(set.name.clone(), mem);
-        }
-        result
+        self.sets
+            .iter_mut()
+            .map(|(name, set)| (name.clone(), set.check(x)))
+            .collect()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    // TODO make test
+    fn initial() {
+        unimplemented!();
     }
 }

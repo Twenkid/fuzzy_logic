@@ -3,7 +3,6 @@ pub type MembershipFunction = Fn(f32) -> f32;
 pub struct MembershipFactory;
 
 impl MembershipFactory {
-    // TODO implement this
     pub fn triangular(a: f32, b: f32, c: f32) -> Box<MembershipFunction> {
         Box::new(move |x: f32| {
             if a <= x && x <= b {

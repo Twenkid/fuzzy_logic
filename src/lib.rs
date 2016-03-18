@@ -1,6 +1,8 @@
 pub mod membership;
 pub mod set;
-pub mod operations;
+pub mod ops;
+pub mod rules;
+pub mod inference;
 
 #[cfg(test)]
 mod test {
