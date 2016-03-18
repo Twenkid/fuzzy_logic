@@ -12,7 +12,6 @@ pub trait Expression {
     fn to_string(&self) -> String;
 }
 
-// TODO implement `is`
 pub struct Is {
     variable: String,
     set: String,
