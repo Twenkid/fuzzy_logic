@@ -65,7 +65,7 @@ impl fmt::Debug for Set {
 pub struct UniversalSet {
     name: String,
     domain: Vec<f32>,
-    sets: HashMap<String, Set>,
+    pub sets: HashMap<String, Set>, // TODO
 }
 
 impl UniversalSet {
