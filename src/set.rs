@@ -3,7 +3,7 @@ extern crate ordered_float;
 use std::fmt;
 use std::f32;
 use std::collections::HashMap;
-use membership::MembershipFunction;
+use functions::MembershipFunction;
 
 use self::ordered_float::OrderedFloat;
 
@@ -40,7 +40,7 @@ impl Set {
         {
             let value = self.cache.entry(ordered).or_insert(match func {
                 Some(f) => f(x),
-                None => unreachable!(),
+                None => 0.0,
             });
             mem = *value;
         }
@@ -82,11 +82,17 @@ impl UniversalSet {
     }
 
     pub fn create_set(&mut self, name: String, membership: Box<MembershipFunction>) {
-        self.sets.entry(name.clone()).or_insert(Set {
-            name: name,
-            membership: Some(membership),
-            cache: HashMap::new(),
-        });
+        if !self.sets.contains_key(&name) {
+            let mut set = Set {
+                name: name.clone(),
+                membership: Some(membership),
+                cache: HashMap::new(),
+            };
+            for i in &self.domain {
+                set.check(*i);
+            }
+            self.sets.insert(name, set);
+        }
     }
 
     pub fn memberships(&mut self, x: f32) -> HashMap<String, f32> {

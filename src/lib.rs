@@ -1,4 +1,4 @@
-pub mod membership;
+pub mod functions;
 pub mod set;
 pub mod ops;
 pub mod rules;

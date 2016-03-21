@@ -29,7 +29,12 @@ impl Is {
 impl Expression for Is {
     fn eval(&self, context: &mut InferenceContext) -> f32 {
         let value = context.values[&self.variable];
-        let mut set = context.sets.get_mut(&self.set).unwrap();
+        let mut universe = context.universes
+                                  .get_mut(&self.variable)
+                                  .expect(&format!("{} is not exists", &self.variable));
+        let mut set = universe.sets
+                              .get_mut(&self.set)
+                              .expect(&format!("{} is not exists", &self.set));
         set.check(value)
     }
     fn to_string(&self) -> String {
@@ -113,53 +118,59 @@ impl Expression for Not {
     }
 }
 
-pub struct Rule<E: Expression> {
-    name: String,
-    condition: E,
-    result: String,
+pub struct Rule {
+    condition: Box<Expression>,
+    result_set: String,
+    result_universe: String,
 }
 
-impl<E: Expression> Rule<E> {
-    pub fn new(name: String, condition: E, result: String) -> Rule<E> {
+impl Rule {
+    pub fn new(condition: Box<Expression>, result_universe: String, result_set: String) -> Rule {
         Rule {
-            name: name,
             condition: condition,
-            result: result,
+            result_set: result_set,
+            result_universe: result_universe,
         }
     }
     pub fn compute(&self, context: &mut InferenceContext) -> Set {
-        let expression_result = self.condition.eval(context);
-        let result_set = context.sets.get_mut(&self.result).unwrap();
-        let result_values = result_set.cache
-                                      .iter()
-                                      .filter_map(|(&key, &value)| {
-                                          if value <= expression_result {
-                                              Some((key, value))
-                                          } else {
-                                              None
-                                          }
-                                      })
-                                      .collect::<HashMap<_, f32>>();
-        Set::new_with_domain(format!("{} rule result", self.name), result_values)
+        let expression_result = (*self.condition).eval(context);
+        let universe = context.universes
+                              .get(&self.result_universe)
+                              .expect(&format!("{} is not exists", &self.result_universe));
+        let set = universe.sets
+                          .get(&self.result_set)
+                          .expect(&format!("{} is not exists", &self.result_set));
+        let result_values = set.cache
+                               .iter()
+                               .filter_map(|(&key, &value)| {
+                                   if value <= expression_result {
+                                       Some((key, value))
+                                   } else {
+                                       None
+                                   }
+                               })
+                               .collect::<HashMap<_, f32>>();
+        Set::new_with_domain(format!("{}: {}", &self.result_universe, &self.result_set),
+                             result_values)
     }
 }
 
-impl<E: Expression> fmt::Display for Rule<E> {
+impl fmt::Display for Rule {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,
-               "(Rule:\"{}\" if:{} then:{})",
-               self.name,
-               self.condition.to_string(),
-               self.result)
+               "(Rule {}:{} if:{})",
+               &self.result_universe,
+               &self.result_set,
+               &(*self.condition).to_string())
     }
 }
 
-pub struct RuleSet<E: Expression> {
-    rules: Vec<Rule<E>>,
+pub struct RuleSet {
+    rules: Vec<Rule>,
 }
 
-impl<E: Expression> RuleSet<E> {
-    pub fn new(rules: Vec<Rule<E>>) -> RuleSet<E> {
+impl RuleSet {
+    pub fn new(rules: Vec<Rule>) -> RuleSet {
         RuleSet { rules: rules }
     }
     pub fn compute_all(&self, context: &mut InferenceContext) -> Set {
@@ -172,7 +183,7 @@ impl<E: Expression> RuleSet<E> {
     }
 }
 
-impl<E: Expression> fmt::Display for RuleSet<E> {
+impl fmt::Display for RuleSet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut s = String::new();
         for rule in &self.rules {

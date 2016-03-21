@@ -1,9 +1,9 @@
 use set::{Set, UniversalSet};
 use ops::{LogicOps, SetOps};
 use rules::{RuleSet, Expression};
+use functions::DefuzzFunc;
 use std::collections::HashMap;
 
-pub type DefuzzFunc = Fn(&Set) -> f32;
 
 pub struct InferenceOptions {
     pub logic_ops: Box<LogicOps>,
@@ -13,28 +13,26 @@ pub struct InferenceOptions {
 
 pub struct InferenceContext<'a> {
     pub values: &'a HashMap<String, f32>,
-    pub sets: &'a mut HashMap<String, Set>,
+    pub universes: &'a mut HashMap<String, UniversalSet>,
     pub options: &'a InferenceOptions,
 }
 
-pub struct InferenceMachine<E: Expression> {
-    pub rules: RuleSet<E>,
-    pub universe: UniversalSet,
+pub struct InferenceMachine {
+    pub rules: RuleSet,
+    pub universes: HashMap<String, UniversalSet>,
     pub values: HashMap<String, f32>,
     pub options: InferenceOptions,
 }
 
-impl<E: Expression> InferenceMachine<E> {
-    // add code here
-    pub fn new(rules: RuleSet<E>,
-               universe: UniversalSet,
-               options: InferenceOptions,
-               values: HashMap<String, f32>)
-               -> InferenceMachine<E> {
+impl InferenceMachine {
+    pub fn new(rules: RuleSet,
+               universes: HashMap<String, UniversalSet>,
+               options: InferenceOptions)
+               -> InferenceMachine {
         InferenceMachine {
             rules: rules,
-            universe: universe,
-            values: values,
+            universes: universes,
+            values: HashMap::new(),
             options: options,
         }
     }
@@ -46,7 +44,7 @@ impl<E: Expression> InferenceMachine<E> {
     pub fn compute(&mut self) -> f32 {
         let mut context = InferenceContext {
             values: &self.values,
-            sets: &mut self.universe.sets,
+            universes: &mut self.universes,
             options: &self.options,
         };
         let result = self.rules.compute_all(&mut context);

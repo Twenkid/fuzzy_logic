@@ -43,7 +43,7 @@ pub trait LogicOps {
     fn not(&self, value: f32) -> f32;
 }
 
-struct ZadehOps;
+pub struct ZadehOps;
 
 impl LogicOps for ZadehOps {
     fn and(&self, left: f32, right: f32) -> f32 {

@@ -1,4 +1,6 @@
+use set::Set;
 pub type MembershipFunction = Fn(f32) -> f32;
+pub type DefuzzFunc = Fn(&Set) -> f32;
 
 pub struct MembershipFactory;
 
@@ -22,6 +24,18 @@ impl MembershipFactory {
 
     pub fn sigmoidal(a: f32, c: f32) -> Box<MembershipFunction> {
         Box::new(move |x: f32| 1.0 / (1.0 + (-1.0 * a * (x - c)).exp()))
+    }
+}
+
+pub struct DefuzzFactory;
+
+impl DefuzzFactory {
+    pub fn center_of_mass() -> Box<DefuzzFunc> {
+        Box::new(|s: &Set| {
+            let sum = s.cache.iter().fold(0.0, |acc, (&k, &v)| acc + v);
+            let prod_sum = s.cache.iter().fold(0.0, |acc, (&k, &v)| acc + k.into_inner() * v);
+            prod_sum / sum
+        })
     }
 }
 
