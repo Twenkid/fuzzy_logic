@@ -41,13 +41,13 @@ impl InferenceMachine {
         self.values = values.clone();
     }
 
-    pub fn compute(&mut self) -> f32 {
+    pub fn compute(&mut self) -> (String, f32) {
         let mut context = InferenceContext {
             values: &self.values,
             universes: &mut self.universes,
             options: &self.options,
         };
         let result = self.rules.compute_all(&mut context);
-        (*self.options.defuzz_func)(&result)
+        (result.name.clone(), (*self.options.defuzz_func)(&result))
     }
 }

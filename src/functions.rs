@@ -25,6 +25,10 @@ impl MembershipFactory {
     pub fn sigmoidal(a: f32, c: f32) -> Box<MembershipFunction> {
         Box::new(move |x: f32| 1.0 / (1.0 + (-1.0 * a * (x - c)).exp()))
     }
+
+    pub fn gaussian(a: f32, b: f32, c: f32) -> Box<MembershipFunction> {
+        Box::new(move |x: f32| a * (-1.0 * ((x - b).powi(2) / (2.0 * c.powi(2)))).exp())
+    }
 }
 
 pub struct DefuzzFactory;

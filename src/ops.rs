@@ -1,4 +1,3 @@
-
 use set::{Set, UniversalSet};
 use std::collections::HashMap;
 

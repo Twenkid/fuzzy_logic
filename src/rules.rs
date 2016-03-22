@@ -170,12 +170,20 @@ pub struct RuleSet {
 }
 
 impl RuleSet {
-    pub fn new(rules: Vec<Rule>) -> RuleSet {
-        RuleSet { rules: rules }
+    pub fn new(rules: Vec<Rule>) -> Result<RuleSet, String> {
+        let mut rule_universe = rules[0].result_universe.clone();
+        for rule in &rules {
+            if rule_universe != rule.result_universe {
+                return Err(format!("Rules are in different result universes({} and {})",
+                                   &rule_universe,
+                                   &rule.result_universe));
+            }
+        }
+        return Ok(RuleSet { rules: rules });
     }
     pub fn compute_all(&self, context: &mut InferenceContext) -> Set {
-        let mut result_set = Set::new_empty();
-        for rule in &self.rules {
+        let mut result_set = self.rules[0].compute(context);
+        for rule in &self.rules[1..self.rules.len()] {
             let mut result = rule.compute(context);
             result_set = (*context.options.set_ops).union(&mut result_set, &mut result);
         }

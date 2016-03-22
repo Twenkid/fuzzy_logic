@@ -62,7 +62,7 @@ fn main() {
                         Is::new("Pressure".to_string(), "High".to_string()));
     let rule2 = Rule::new(Box::new(root2), "Valve".to_string(), "Open".to_string());
 
-    let rules = RuleSet::new(vec![rule1, rule2]);
+    let rules = RuleSet::new(vec![rule1, rule2]).unwrap();
 
     let inf_opts = InferenceOptions {
         logic_ops: Box::new(ZadehOps),

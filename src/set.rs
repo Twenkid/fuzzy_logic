@@ -29,10 +29,6 @@ impl Set {
         }
     }
 
-    pub fn new_empty() -> Set {
-        Set::new_with_domain("Empty".to_string(), HashMap::new())
-    }
-
     pub fn check(&mut self, x: f32) -> f32 {
         let ordered = OrderedFloat(x);
         let func = self.membership.as_ref();
