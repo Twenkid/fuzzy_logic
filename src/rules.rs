@@ -189,6 +189,10 @@ impl RuleSet {
         }
         result_set
     }
+
+    pub fn compute_all_async(&self, context: &InferenceContext) -> Set  {
+        unimplemented!()
+    }
 }
 
 impl fmt::Display for RuleSet {
