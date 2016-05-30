@@ -36,8 +36,8 @@ pub struct DefuzzFactory;
 impl DefuzzFactory {
     pub fn center_of_mass() -> Box<DefuzzFunc> {
         Box::new(|s: &Set| {
-            let sum = s.cache.iter().fold(0.0, |acc, (&k, &v)| acc + v);
-            let prod_sum = s.cache.iter().fold(0.0, |acc, (&k, &v)| acc + k.into_inner() * v);
+            let sum = s.cache.borrow().iter().fold(0.0, |acc, (&k, &v)| acc + v);
+            let prod_sum = s.cache.borrow().iter().fold(0.0, |acc, (&k, &v)| acc + k.into_inner() * v);
             prod_sum / sum
         })
     }

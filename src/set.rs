@@ -3,6 +3,7 @@ extern crate ordered_float;
 use std::fmt;
 use std::f32;
 use std::collections::HashMap;
+use std::cell::RefCell;
 use functions::MembershipFunction;
 
 use self::ordered_float::OrderedFloat;
@@ -10,7 +11,7 @@ use self::ordered_float::OrderedFloat;
 pub struct Set {
     pub name: String,
     pub membership: Option<Box<MembershipFunction>>,
-    pub cache: HashMap<OrderedFloat<f32>, f32>,
+    pub cache: RefCell<HashMap<OrderedFloat<f32>, f32>>,
 }
 
 impl Set {
@@ -18,10 +19,10 @@ impl Set {
         Set {
             name: name,
             membership: Some(membership),
-            cache: HashMap::new(),
+            cache: RefCell::new(HashMap::new()),
         }
     }
-    pub fn new_with_domain(name: String, cache: HashMap<OrderedFloat<f32>, f32>) -> Set {
+    pub fn new_with_domain(name: String, cache: RefCell<HashMap<OrderedFloat<f32>, f32>>) -> Set {
         Set {
             name: name,
             membership: None,
@@ -29,19 +30,20 @@ impl Set {
         }
     }
 
-    pub fn check(&mut self, x: f32) -> f32 {
+    pub fn check(&self, x: f32) -> f32 {
         let ordered = OrderedFloat(x);
         let func = self.membership.as_ref();
+        let mut cache = self.cache.borrow_mut();
         let mut mem = 0.0;
         {
-            let value = self.cache.entry(ordered).or_insert(match func {
+            let value = cache.entry(ordered).or_insert(match func {
                 Some(f) => f(x),
                 None => 0.0,
             });
             mem = *value;
         }
         if mem <= 0.0 {
-            self.cache.remove(&ordered);
+            cache.remove(&ordered);
         }
         mem
     }
@@ -50,7 +52,7 @@ impl Set {
 impl fmt::Debug for Set {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut s = String::new();
-        for (k, v) in &self.cache {
+        for (k, v) in self.cache.borrow().iter() {
             s = s + &format!("k:{} v:{}\n", k, v);
         }
         write!(f, "Set {{ name: {}\ncache: {} }}", self.name, s)
@@ -79,10 +81,10 @@ impl UniversalSet {
 
     pub fn create_set(&mut self, name: String, membership: Box<MembershipFunction>) {
         if !self.sets.contains_key(&name) {
-            let mut set = Set {
+            let set = Set {
                 name: name.clone(),
                 membership: Some(membership),
-                cache: HashMap::new(),
+                cache: RefCell::new(HashMap::new()),
             };
             for i in &self.domain {
                 set.check(*i);

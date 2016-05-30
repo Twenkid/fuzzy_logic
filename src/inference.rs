@@ -1,6 +1,6 @@
-use set::{Set, UniversalSet};
+use set::UniversalSet;
 use ops::{LogicOps, SetOps};
-use rules::{RuleSet, Expression};
+use rules::RuleSet;
 use functions::DefuzzFunc;
 use std::collections::HashMap;
 

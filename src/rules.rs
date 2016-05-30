@@ -1,14 +1,14 @@
 extern crate ordered_float;
-use self::ordered_float::OrderedFloat;
 
 use inference::InferenceContext;
 use set::Set;
 
 use std::fmt;
+use std::cell::RefCell;
 use std::collections::HashMap;
 
 pub trait Expression {
-    fn eval(&self, context: &mut InferenceContext) -> f32;
+    fn eval(&self, context: &InferenceContext) -> f32;
     fn to_string(&self) -> String;
 }
 
@@ -27,13 +27,13 @@ impl Is {
 }
 
 impl Expression for Is {
-    fn eval(&self, context: &mut InferenceContext) -> f32 {
+    fn eval(&self, context: &InferenceContext) -> f32 {
         let value = context.values[&self.variable];
-        let mut universe = context.universes
-                                  .get_mut(&self.variable)
+        let universe = context.universes
+                                  .get(&self.variable)
                                   .expect(&format!("{} is not exists", &self.variable));
-        let mut set = universe.sets
-                              .get_mut(&self.set)
+        let set = universe.sets
+                              .get(&self.set)
                               .expect(&format!("{} is not exists", &self.set));
         set.check(value)
     }
@@ -60,7 +60,7 @@ impl<L: Expression, R: Expression> And<L, R> {
 }
 
 impl<L: Expression, R: Expression> Expression for And<L, R> {
-    fn eval(&self, context: &mut InferenceContext) -> f32 {
+    fn eval(&self, context: &InferenceContext) -> f32 {
         let left_result = self.left.eval(context);
         let right_result = self.right.eval(context);
         (*context.options.logic_ops).and(left_result, right_result)
@@ -88,7 +88,7 @@ impl<L: Expression, R: Expression> Or<L, R> {
 }
 
 impl<L: Expression, R: Expression> Expression for Or<L, R> {
-    fn eval(&self, context: &mut InferenceContext) -> f32 {
+    fn eval(&self, context: &InferenceContext) -> f32 {
         let left_result = self.left.eval(context);
         let right_result = self.right.eval(context);
         (*context.options.logic_ops).or(left_result, right_result)
@@ -109,7 +109,7 @@ impl Not {
 }
 
 impl Expression for Not {
-    fn eval(&self, context: &mut InferenceContext) -> f32 {
+    fn eval(&self, context: &InferenceContext) -> f32 {
         let value = (*self.expression).eval(context);
         (*context.options.logic_ops).not(value)
     }
@@ -132,7 +132,7 @@ impl Rule {
             result_universe: result_universe,
         }
     }
-    pub fn compute(&self, context: &mut InferenceContext) -> Set {
+    pub fn compute(&self, context: &InferenceContext) -> Set {
         let expression_result = (*self.condition).eval(context);
         let universe = context.universes
                               .get(&self.result_universe)
@@ -140,7 +140,7 @@ impl Rule {
         let set = universe.sets
                           .get(&self.result_set)
                           .expect(&format!("{} is not exists", &self.result_set));
-        let result_values = set.cache
+        let result_values = set.cache.borrow()
                                .iter()
                                .filter_map(|(&key, &value)| {
                                    if value <= expression_result {
@@ -151,7 +151,7 @@ impl Rule {
                                })
                                .collect::<HashMap<_, f32>>();
         Set::new_with_domain(format!("{}: {}", &self.result_universe, &self.result_set),
-                             result_values)
+                             RefCell::new(result_values))
     }
 }
 
@@ -171,7 +171,7 @@ pub struct RuleSet {
 
 impl RuleSet {
     pub fn new(rules: Vec<Rule>) -> Result<RuleSet, String> {
-        let mut rule_universe = rules[0].result_universe.clone();
+        let rule_universe = rules[0].result_universe.clone();
         for rule in &rules {
             if rule_universe != rule.result_universe {
                 return Err(format!("Rules are in different result universes({} and {})",
@@ -181,7 +181,7 @@ impl RuleSet {
         }
         return Ok(RuleSet { rules: rules });
     }
-    pub fn compute_all(&self, context: &mut InferenceContext) -> Set {
+    pub fn compute_all(&self, context: &InferenceContext) -> Set {
         let mut result_set = self.rules[0].compute(context);
         for rule in &self.rules[1..self.rules.len()] {
             let mut result = rule.compute(context);
