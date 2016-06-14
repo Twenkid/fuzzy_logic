@@ -40,10 +40,20 @@ impl MembershipFactory {
     }
 
     /// Creates trapezoidal function.
-    ///
-    /// Not implemented yet.
     pub fn trapezoidal(a: f32, b: f32, c: f32, d: f32) -> Box<MembershipFunction> {
-        unimplemented!();
+        Box::new(move |x: f32| {
+            if x < a {
+                0.0
+            } else if x <= b {
+                (x - a) / (b - a)
+            } else if x <= c {
+                1.0
+            } else if x <= d {
+                (d - x) / (d - c)
+            } else {
+                0.0
+            }
+        })
     }
 
     /// Creates sigmoidal function.
