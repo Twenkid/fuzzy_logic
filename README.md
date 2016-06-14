@@ -1,6 +1,7 @@
 # fuzzy_logic
 Fuzzy logic inference implementation.
 
+[![Build Status](https://travis-ci.org/KineticCookie/fuzzy_logic.svg?branch=master)](https://travis-ci.org/KineticCookie/fuzzy_logic)
 ## Usage
 This crate is not in `crates.io` yet.
 So you can pull it from GitHub:
@@ -11,5 +12,5 @@ git = "https://github.com/KineticCookie/fuzzy_logic"
 ```
 And declare the new crate with:
 ```rust
-extern crate piston_window;
+extern crate fuzzy_logic;
 ```
