@@ -17,3 +17,5 @@ target
 # More information here http://doc.crates.io/guide.html#cargotoml-vs-cargolock
 >>>>>>> e53add80c94babe0cec98fe9ba01e194035f4f01
 Cargo.lock
+
+src/main.rs

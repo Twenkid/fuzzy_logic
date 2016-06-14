@@ -2,7 +2,7 @@ extern crate fuzzy_logic;
 
 use std::collections::HashMap;
 
-use fuzzy_logic::set::{UniversalSet, Set};
+use fuzzy_logic::set::UniversalSet;
 use fuzzy_logic::functions::{MembershipFactory, DefuzzFactory};
 use fuzzy_logic::ops::{MinMaxOps, ZadehOps};
 use fuzzy_logic::inference::*;
