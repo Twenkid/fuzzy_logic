@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["MinMaxOps","Implementation of commonly used minimax set operations."],["ZadehOps","Implementation of commonly used Zadeh fuzzy logic operations."]],"trait":[["LogicOps","Abstraction over fuzzy logic operations. Doesn't contain default implementation."],["SetOps","Abstraction over set operations. Doesn't contain default implementation."]]});

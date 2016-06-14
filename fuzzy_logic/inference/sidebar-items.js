@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["InferenceContext","Structure which contains the evaluation context. Passed to `RuleSet`."],["InferenceMachine","Structure which contains the implementation of the fuzzy logic inference mechanism."],["InferenceOptions","Structure which contains the implementation of fuzzy logic operations."]]});
