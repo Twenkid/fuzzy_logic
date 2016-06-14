@@ -1,4 +1,8 @@
 extern crate ordered_float;
+extern crate num_cpus;
+extern crate scoped_threadpool;
+
+use self::scoped_threadpool::Pool;
 
 use inference::InferenceContext;
 use set::Set;
@@ -6,6 +10,8 @@ use set::Set;
 use std::fmt;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::sync::{Arc, Barrier, Mutex};
+use std::sync::mpsc::channel;
 
 pub trait Expression {
     fn eval(&self, context: &InferenceContext) -> f32;
@@ -190,8 +196,26 @@ impl RuleSet {
         result_set
     }
 
+    #[cfg(feature = "async_rules")]
     pub fn compute_all_async(&self, context: &InferenceContext) -> Set  {
-        unimplemented!()
+        let mut pool = Pool::new(num_cpus::get() as u32);
+        pool.scoped(|scope| {
+            let mut counter = self.rules.len();
+            let (tx, rx) = channel();
+            for rule in self.rules.iter() {
+                let tx = tx.clone();
+                scope.execute(move || {
+                    let rule_result = rule.compute(context);
+                    tx.send(rule_result).unwrap();
+                });
+            }
+            let mut result = Set::empty();
+            while counter != 0 {
+                result = (*context.options.set_ops).union(&mut result, &mut rx.recv().unwrap());
+                counter -= 1;
+            }
+            result
+        })
     }
 }
 

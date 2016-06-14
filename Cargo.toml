@@ -5,3 +5,8 @@ authors = ["Lutfullin Bulat <lb6557@gmail.com>"]
 
 [dependencies]
 ordered-float = {version = "0.2.0", git = "https://github.com/AerialX/rust-ordered-float.git", rev="3aa8aa506b3231712958093ee513b37206a474da"}
+num_cpus = "0.2.12"
+scoped_threadpool = "0.1.7"
+
+[features]
+async_rules=[]

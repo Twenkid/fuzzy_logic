@@ -4,6 +4,7 @@ use std::fmt;
 use std::f32;
 use std::collections::HashMap;
 use std::cell::RefCell;
+use std::ops::{Not, BitOr, BitAnd};
 use functions::MembershipFunction;
 
 use self::ordered_float::OrderedFloat;
@@ -30,6 +31,14 @@ impl Set {
         }
     }
 
+    pub fn empty() -> Set{
+        Set{
+            name: "".to_string(),
+            membership: None,
+            cache: RefCell::new(HashMap::new())
+        }
+    }
+
     pub fn check(&self, x: f32) -> f32 {
         let ordered = OrderedFloat(x);
         let func = self.membership.as_ref();
@@ -48,6 +57,8 @@ impl Set {
         mem
     }
 }
+
+
 
 impl fmt::Debug for Set {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

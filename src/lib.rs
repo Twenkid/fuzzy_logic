@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 pub mod functions;
 pub mod set;
 pub mod ops;
