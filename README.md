@@ -1,6 +1,8 @@
 # fuzzy_logic
 Fuzzy logic inference implementation.
 
+[Documentation](http://kineticcookie.github.io/fuzzy_logic/fuzzy_logic/index.html)
+
 [![Build Status](https://travis-ci.org/KineticCookie/fuzzy_logic.svg?branch=master)](https://travis-ci.org/KineticCookie/fuzzy_logic)
 ## Usage
 This crate is not in `crates.io` yet.
