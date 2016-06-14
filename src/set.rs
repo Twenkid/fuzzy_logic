@@ -104,10 +104,4 @@ impl UniversalSet {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    // TODO make test
-    fn initial() {
-        unimplemented!();
-    }
 }
