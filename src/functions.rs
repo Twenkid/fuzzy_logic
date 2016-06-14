@@ -36,7 +36,7 @@ pub struct DefuzzFactory;
 impl DefuzzFactory {
     pub fn center_of_mass() -> Box<DefuzzFunc> {
         Box::new(|s: &Set| {
-            let sum = s.cache.borrow().iter().fold(0.0, |acc, (&k, &v)| acc + v);
+            let sum = s.cache.borrow().iter().fold(0.0, |acc, (_, &v)| acc + v);
             let prod_sum = s.cache.borrow().iter().fold(0.0, |acc, (&k, &v)| acc + k.into_inner() * v);
             prod_sum / sum
         })
@@ -57,18 +57,5 @@ mod test {
             let mut diff = (0.5 - f(midpoint)).abs();
             assert!(diff <= f32::EPSILON);
         }
-    }
-
-    #[test]
-    // TODO make tests
-    fn triangular() {
-        let f = MembershipFactory::triangular(1.0, 2.0, 3.0);
-    }
-
-    #[test]
-    // TODO make tests
-    fn trapezoidal() {
-        let f = MembershipFactory::trapezoidal(1.0, 2.0, 3.0, 4.0);
-
     }
 }
