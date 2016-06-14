@@ -1,3 +1,10 @@
+#![warn(missing_docs)]
+//! The implementation of the fuzzy logic inference.
+//!
+//! Provides structs, which defines fuzzy sets and rules.
+//! Rules are constructed with logical operations but implementation of operations is chosen by user.
+//!
+//! User is available to implement his own functions and operations.
 pub mod functions;
 pub mod set;
 pub mod ops;

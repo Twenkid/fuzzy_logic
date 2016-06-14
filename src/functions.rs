@@ -1,10 +1,32 @@
+//! This module defines types and structures for fuzzy logic functions.
+//!
+//! Module contains implementation of membership functions and defuzzification functions.
+//! Also contains factory methods to create most used functions.
+
 use set::Set;
+
+/// Used to calculate the membership of the given item.
+/// All membership functions must be this type.
 pub type MembershipFunction = Fn(f32) -> f32;
+
+/// Used to defuzzificate the fuzzy logic inference result.
+/// All defuzzification functions must be this type.
 pub type DefuzzFunc = Fn(&Set) -> f32;
 
+/// Defines methods to create most used membership functions.
+///
+/// #Usage
+/// Create triangular function:
+///
+/// ```rust
+/// use fuzzy_logic::functions::MembershipFactory;
+/// let mem = MembershipFactory::triangular(-15.0, -15.0, 22.0);
+/// mem(-15.0); // -> 1.0
+/// ```
 pub struct MembershipFactory;
 
 impl MembershipFactory {
+    /// Creates triangular function.
     pub fn triangular(a: f32, b: f32, c: f32) -> Box<MembershipFunction> {
         Box::new(move |x: f32| {
             if a <= x && x <= b {
@@ -17,23 +39,42 @@ impl MembershipFactory {
         })
     }
 
-    // TODO implement this
+    /// Creates trapezoidal function.
+    ///
+    /// Not implemented yet.
     pub fn trapezoidal(a: f32, b: f32, c: f32, d: f32) -> Box<MembershipFunction> {
         unimplemented!();
     }
 
+    /// Creates sigmoidal function.
     pub fn sigmoidal(a: f32, c: f32) -> Box<MembershipFunction> {
         Box::new(move |x: f32| 1.0 / (1.0 + (-1.0 * a * (x - c)).exp()))
     }
 
+    /// Creates gaussian function.
     pub fn gaussian(a: f32, b: f32, c: f32) -> Box<MembershipFunction> {
         Box::new(move |x: f32| a * (-1.0 * ((x - b).powi(2) / (2.0 * c.powi(2)))).exp())
     }
 }
 
+/// Defines methods to create most used defuzzification functions.
+///
+/// #Usage
+/// Create function which calculates center of mass:
+///
+/// ```rust
+/// use fuzzy_logic::functions::{DefuzzFactory, MembershipFactory};
+/// use fuzzy_logic::set::Set;
+///
+/// let mem = MembershipFactory::triangular(-15.0, -15.0, 22.0);
+/// let df = DefuzzFactory::center_of_mass();
+/// let set = Set::new_with_mem("Test".to_string(), mem);
+/// df(&set);
+/// ```
 pub struct DefuzzFactory;
 
 impl DefuzzFactory {
+    /// Creates function which calculates center of mass.
     pub fn center_of_mass() -> Box<DefuzzFunc> {
         Box::new(|s: &Set| {
             let sum = s.cache.borrow().iter().fold(0.0, |acc, (_, &v)| acc + v);
