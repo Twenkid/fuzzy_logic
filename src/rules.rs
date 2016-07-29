@@ -3,8 +3,6 @@
 //! Fuzzy set operations and fuzzy logic operations are defined here.
 //!
 //! User can implement his own operations by implementing `LogicOps` or `SetOps` traits.
-extern crate ordered_float;
-
 use inference::InferenceContext;
 use set::Set;
 
@@ -180,6 +178,9 @@ impl Rule {
         let set = universe.sets
                           .get(&self.result_set)
                           .expect(&format!("{} is not exists", &self.result_set));
+                          //TODO: return new set. 
+            unimplemented!();
+                          /*
         let result_values = set.cache.borrow()
                                .iter()
                                .filter_map(|(&key, &value)| {
@@ -192,6 +193,8 @@ impl Rule {
                                .collect::<HashMap<_, f32>>();
         Set::new_with_domain(format!("{}: {}", &self.result_universe, &self.result_set),
                              RefCell::new(result_values))
+                             */
+
     }
 }
 
