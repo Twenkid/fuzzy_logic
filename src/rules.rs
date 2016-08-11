@@ -37,16 +37,17 @@ impl Is {
 }
 
 impl Expression for Is {
+    //  TODO redesign
     /// Returns membership of given value.
     fn eval(&self, context: &InferenceContext) -> f32 {
         let value = context.values[&self.variable];
         let universe = context.universes
-                                  .get(&self.variable)
-                                  .expect(&format!("{} is not exists", &self.variable));
+            .get(&self.variable)
+            .expect(&format!("{} is not exists", &self.variable));
         let set = universe.sets
-                              .get(&self.set)
-                              .expect(&format!("{} is not exists", &self.set));
-        set.check(value)
+            .get(&self.set)
+            .expect(&format!("{} is not exists", &self.set));
+        set.check(&value)
     }
     /// String representation of the current `Is` expression.
     fn to_string(&self) -> String {
@@ -173,27 +174,13 @@ impl Rule {
     pub fn compute(&self, context: &InferenceContext) -> Set {
         let expression_result = (*self.condition).eval(context);
         let universe = context.universes
-                              .get(&self.result_universe)
-                              .expect(&format!("{} is not exists", &self.result_universe));
+            .get(&self.result_universe)
+            .expect(&format!("{} is not exists", &self.result_universe));
         let set = universe.sets
-                          .get(&self.result_set)
-                          .expect(&format!("{} is not exists", &self.result_set));
-                          //TODO: return new set. 
-            unimplemented!();
-                          /*
-        let result_values = set.cache.borrow()
-                               .iter()
-                               .filter_map(|(&key, &value)| {
-                                   if value <= expression_result {
-                                       Some((key, value))
-                                   } else {
-                                       None
-                                   }
-                               })
-                               .collect::<HashMap<_, f32>>();
-        Set::new_with_domain(format!("{}: {}", &self.result_universe, &self.result_set),
-                             RefCell::new(result_values))
-                             */
+            .get(&self.result_set)
+            .expect(&format!("{} is not exists", &self.result_set));
+        // TODO: return new set.
+        unimplemented!();
 
     }
 }
@@ -229,13 +216,14 @@ impl RuleSet {
     }
 
     /// Computes all rules. Resulting fuzzy sets are then united and returned.
-    pub fn compute_all(&self, context: &InferenceContext) -> Set {
+    pub fn compute_all(& self, context: &InferenceContext) -> Set {
         let mut result_set = self.rules[0].compute(context);
         for rule in &self.rules[1..self.rules.len()] {
             let mut result = rule.compute(context);
             result_set = (*context.options.set_ops).union(&mut result_set, &mut result);
         }
         result_set
+
     }
 }
 

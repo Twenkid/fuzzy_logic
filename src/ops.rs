@@ -4,15 +4,14 @@
 //!
 //! User can implement his own operations by implementing `LogicOps` or `SetOps` traits.
 use set::Set;
-use std::collections::HashMap;
-use std::cell::RefCell;
+use membership::MembershipFactory;
 
 /// Abstraction over set operations. Doesn't contain default implementation.
 pub trait SetOps {
     /// Union of fuzzy sets.
     fn union(&self, left: &mut Set, right: &mut Set) -> Set;
     /// Intersection of fuzzy sets.
-    fn intersect(&self, left: &mut Set, right: &mut Set) -> Set;
+    fn intersect(& self, left: & mut Set, right: & mut Set) -> Set;
 }
 
 /// Implementation of commonly used minimax set operations.
@@ -23,33 +22,24 @@ impl SetOps for MinMaxOps {
     ///
     /// Values with highest memberships are copied to the result set.
     fn union(&self, left: &mut Set, right: &mut Set) -> Set {
-        let mut result = HashMap::new();
-        for (k, v) in left.cache.borrow().iter() {
-            let right_mem = right.check(k.into_inner());
-            result.insert(*k, v.max(right_mem));
-        }
-        for (k, v) in right.cache.borrow().iter() {
-            if result.contains_key(k) {
-                continue;
-            }
-            let left_mem = left.check(k.into_inner());
-            result.insert(*k, v.max(left_mem));
-        }
-        Set::new_with_domain(format!("{} UNION {}", left.name, right.name), RefCell::new(result))
+        let left_mf = left.get_membership();
+        let right_mf = right.get_membership();
+        let new_mf = Box::new(move |x: &f32| left_mf.call(x).max(right_mf.call(x)));
+        let anon_mf = Box::new(MembershipFactory::anonymous(new_mf));
+        Set::new(&format!("{} UNION {}", left.get_name(), right.get_name()),
+                 anon_mf)
     }
 
     /// Intersection of fuzzy sets.
     ///
     /// Values with lowest memberships are copied to the result set.
-    fn intersect(&self, left: &mut Set, right: &mut Set) -> Set {
-        let mut result = HashMap::new();
-        for (k, v) in left.cache.borrow().iter() {
-            let right_mem = right.check(k.into_inner());
-            if right_mem > 0.0 {
-                result.insert(*k, v.min(right_mem));
-            }
-        }
-        Set::new_with_domain(format!("{} INTERSECT {}", left.name, right.name), RefCell::new(result))
+    fn intersect(& self, left: &mut Set, right: &mut Set) -> Set {
+        let left_mf = left.get_membership();
+        let right_mf = right.get_membership();
+        let new_mf = Box::new(move |x: &f32| left_mf.call(x).min(right_mf.call(x)));
+        let anon_mf = Box::new(MembershipFactory::anonymous(new_mf));
+        Set::new(&format!("{} UNION {}", left.get_name(), right.get_name()),
+                 anon_mf)
     }
 }
 

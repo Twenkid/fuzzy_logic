@@ -6,32 +6,43 @@
 use std::fmt;
 use std::f32;
 use std::collections::HashMap;
-use std::cell::RefCell;
-use functions::MembershipFunction;
+use std::rc::Rc;
+use membership::mf::MembershipFunction;
+use membership::anon_mf::AnonymousMF;
 
 /// Fuzzy set itself.
 pub struct Set {
     /// Name of the fuzzy set.
-    pub name: String,
+    name: String,
+
     /// Membership function.
-    pub membership: Box<MembershipFunction>,
+    membership: Rc<Box<MembershipFunction>>,
+
 }
 
 impl Set {
     /// Constructs the new `Set` with given membership function.
     /// Don't create sets with this method. Use `UniversalSet`.
-    pub fn new_with_mem(name: String, membership: Box<MembershipFunction>) -> Set {
+    pub fn new(name: &str, membership: Box<MembershipFunction>) -> Self {
         Set {
-            name: name,
-            membership: membership,
+            name: name.to_string(),
+            membership: Rc::new(membership),
         }
     }
 
     /// Returns the membership of item.
     /// If already computed -- returns from cache.
     /// Elsewise -- calculates from function, and if value>0 then caches it.
-    pub fn check(&self, x: f32) -> f32 {
-        (*self.membership)(x)
+    pub fn check(&self, x: &f32) -> f32 {
+        self.membership.call(x)
+    }
+
+    pub fn get_membership(&self) ->Rc<Box<MembershipFunction>> {
+        self.membership.clone()
+    }
+
+    pub fn get_name(&self) -> &str {
+        &self.name
     }
 }
 
@@ -61,18 +72,15 @@ impl UniversalSet {
     }
 
     /// Constructs the child fuzzy set with given membership.
-    pub fn create_set(&mut self, name: String, membership: Box<MembershipFunction>) {
-        if !self.sets.contains_key(&name) {
-            let set = Set {
-                name: name.clone(),
-                membership: membership,
-            };
-            self.sets.insert(name, set);
+    pub fn create_set(& mut self, name: &str, membership: Box<MembershipFunction>) {
+        if !self.sets.contains_key(name) {
+            let set = Set::new(name, membership);
+            self.sets.insert(name.to_string(), set);
         }
     }
 
     /// Computes memberships from all children fuzzy sets.
-    pub fn memberships(&mut self, x: f32) -> HashMap<String, f32> {
+    pub fn memberships(&mut self, x: &f32) -> HashMap<String, f32> {
         self.sets
             .iter_mut()
             .map(|(name, set)| (name.clone(), set.check(x)))

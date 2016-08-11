@@ -3,12 +3,11 @@
 //! `InferenceOptions` contains specified implementations of functions and operations.
 //! `InferenceContext` also contains `&HashMap<String, f32>` to get values of input variables.
 //! Fuzzy logic mechanism is implemented in `InferenceMachine`.
-//! User can modify input variables with `update` method and get inference result with `compute` method.
 
 use set::UniversalSet;
 use ops::{LogicOps, SetOps};
 use rules::RuleSet;
-use functions::DefuzzFunc;
+use defuzz::DefuzzFunc;
 use std::collections::HashMap;
 
 /// Structure which contains the implementation of fuzzy logic operations.
@@ -69,13 +68,13 @@ impl InferenceMachine {
     /// Computes the result of the fuzzy logic inference.
     ///
     /// Returns activated fuzzy rule's name and defuzzificated result.
-    pub fn compute(&mut self) -> (String, f32) {
+    pub fn compute(& mut self) -> (String, f32) {
         let mut context = InferenceContext {
             values: &self.values,
             universes: &mut self.universes,
             options: &self.options,
         };
         let result = self.rules.compute_all(&mut context);
-        (result.name.clone(), (*self.options.defuzz_func)(&result))
+        (result.get_name().to_string(), (*self.options.defuzz_func)(&result))
     }
 }
