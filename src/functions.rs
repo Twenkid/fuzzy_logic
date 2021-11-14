@@ -105,7 +105,7 @@ mod test {
         for i in -100..100 {
             let midpoint = i as f32;
             let f = MembershipFactory::sigmoidal(steepness, midpoint);
-            let mut diff = (0.5 - f(midpoint)).abs();
+            let diff = (0.5 - f(midpoint)).abs();
             assert!(diff <= f32::EPSILON);
         }
     }

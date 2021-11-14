@@ -30,10 +30,10 @@ pub struct Is {
 
 impl Is {
     /// Constructs `Is` expression.
-    pub fn new(variable: String, set: String) -> Is {
+    pub fn new(variable: &str, set: &str) -> Is {
         Is {
-            variable: variable,
-            set: set,
+            variable: variable.into(),
+            set: set.into(),
         }
     }
 }
@@ -74,6 +74,11 @@ impl<L: Expression, R: Expression> And<L, R> {
             left: left,
             right: right,
         }
+    }
+
+    /// Creates a `Box<Self>` for convenience when creating [`Rule`]s
+    pub fn boxed(self) -> Box<And<L, R>> {
+        Box::new(self)
     }
 }
 
@@ -133,7 +138,7 @@ pub struct Not {
 
 impl Not {
     /// Constructs `Not` expression.
-    fn new(expression: Box<dyn Expression>) -> Not {
+    pub fn new(expression: Box<dyn Expression>) -> Not {
         Not { expression: expression }
     }
 }

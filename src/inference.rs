@@ -52,10 +52,10 @@ impl InferenceMachine {
                options: InferenceOptions)
                -> InferenceMachine {
         InferenceMachine {
-            rules: rules,
-            universes: universes,
+            rules,
+            universes,
             values: HashMap::new(),
-            options: options,
+            options,
         }
     }
 
