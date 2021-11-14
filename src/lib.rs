@@ -13,6 +13,10 @@ pub mod inference;
 
 #[cfg(test)]
 mod test {
+    use crate::functions::MembershipFactory;
     #[test]
-    fn it_works() {}
+    fn fuzzy_logic() {
+        let mem = MembershipFactory::triangular(-15.0, -15.0, 22.0);
+        mem(-15.0); // -> 1.0
+    }
 }

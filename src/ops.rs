@@ -3,7 +3,7 @@
 //! Fuzzy set operations and fuzzy logic operations are defined here.
 //!
 //! User can implement his own operations by implementing `LogicOps` or `SetOps` traits.
-use set::Set;
+use crate::set::Set;
 use std::collections::HashMap;
 use std::cell::RefCell;
 

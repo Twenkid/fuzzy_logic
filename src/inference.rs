@@ -5,18 +5,18 @@
 //! Fuzzy logic mechanism is implemented in `InferenceMachine`.
 //! User can modify input variables with `update` method and get inference result with `compute` method.
 
-use set::UniversalSet;
-use ops::{LogicOps, SetOps};
-use rules::RuleSet;
-use functions::DefuzzFunc;
+use crate::set::UniversalSet;
+use crate::ops::{LogicOps, SetOps};
+use crate::rules::RuleSet;
+use crate::functions::DefuzzFunc;
 use std::collections::HashMap;
 
 /// Structure which contains the implementation of fuzzy logic operations.
 pub struct InferenceOptions {
     /// Contains fuzzy logical operations.
-    pub logic_ops: Box<LogicOps>,
+    pub logic_ops: Box<dyn LogicOps>,
     /// Contains fuzzy set operations.
-    pub set_ops: Box<SetOps>,
+    pub set_ops: Box<dyn SetOps>,
     /// Contains defuzzification function.
     pub defuzz_func: Box<DefuzzFunc>,
 }

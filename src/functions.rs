@@ -3,15 +3,15 @@
 //! Module contains implementation of membership functions and defuzzification functions.
 //! Also contains factory methods to create most used functions.
 
-use set::Set;
+use crate::set::Set;
 
 /// Used to calculate the membership of the given item.
 /// All membership functions must be this type.
-pub type MembershipFunction = Fn(f32) -> f32;
+pub type MembershipFunction = dyn Fn(f32) -> f32;
 
 /// Used to defuzzificate the fuzzy logic inference result.
 /// All defuzzification functions must be this type.
-pub type DefuzzFunc = Fn(&Set) -> f32;
+pub type DefuzzFunc = dyn Fn(&Set) -> f32;
 
 /// Defines methods to create most used membership functions.
 ///

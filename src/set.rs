@@ -8,7 +8,7 @@ use std::fmt;
 use std::f32;
 use std::collections::HashMap;
 use std::cell::RefCell;
-use functions::MembershipFunction;
+use crate::functions::MembershipFunction;
 
 use self::ordered_float::OrderedFloat;
 

@@ -5,8 +5,8 @@
 //! User can implement his own operations by implementing `LogicOps` or `SetOps` traits.
 extern crate ordered_float;
 
-use inference::InferenceContext;
-use set::Set;
+use crate::inference::InferenceContext;
+use crate::set::Set;
 
 use std::fmt;
 use std::cell::RefCell;
@@ -128,12 +128,12 @@ impl<L: Expression, R: Expression> Expression for Or<L, R> {
 /// 'Not' expression calculates NOT logical operation with given implementation.
 pub struct Not {
     /// Expression to calculate.
-    expression: Box<Expression>,
+    expression: Box<dyn Expression>,
 }
 
 impl Not {
     /// Constructs `Not` expression.
-    fn new(expression: Box<Expression>) -> Not {
+    fn new(expression: Box<dyn Expression>) -> Not {
         Not { expression: expression }
     }
 }
@@ -154,7 +154,7 @@ impl Expression for Not {
 /// Describes fuzzy inference rule.
 pub struct Rule {
     /// Root of the evaluation tree.
-    condition: Box<Expression>,
+    condition: Box<dyn Expression>,
     /// IF ... THEN `result_set`.
     result_set: String,
     /// The universe of `result_set`.
@@ -163,7 +163,7 @@ pub struct Rule {
 
 impl Rule {
     /// Constructs the new rule with given arguments.
-    pub fn new(condition: Box<Expression>, result_universe: String, result_set: String) -> Rule {
+    pub fn new(condition: Box<dyn Expression>, result_universe: String, result_set: String) -> Rule {
         Rule {
             condition: condition,
             result_set: result_set,
