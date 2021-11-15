@@ -6,10 +6,10 @@
 //!
 //! User is available to implement his own functions and operations.
 pub mod functions;
-pub mod set;
+pub mod inference;
 pub mod ops;
 pub mod rules;
-pub mod inference;
+pub mod set;
 
 #[cfg(test)]
 mod test {

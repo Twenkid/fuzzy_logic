@@ -4,8 +4,7 @@
 //!
 //! User can implement his own operations by implementing `LogicOps` or `SetOps` traits.
 use crate::set::Set;
-use std::collections::HashMap;
-use std::cell::RefCell;
+use std::{cell::RefCell, collections::HashMap};
 
 /// Abstraction over set operations. Doesn't contain default implementation.
 pub trait SetOps {
@@ -35,7 +34,10 @@ impl SetOps for MinMaxOps {
             let left_mem = left.check(k.into_inner());
             result.insert(*k, v.max(left_mem));
         }
-        Set::new_with_domain(format!("{} UNION {}", left.name, right.name), RefCell::new(result))
+        Set::new_with_domain(
+            format!("{} UNION {}", left.name, right.name),
+            RefCell::new(result),
+        )
     }
 
     /// Intersection of fuzzy sets.
@@ -49,7 +51,10 @@ impl SetOps for MinMaxOps {
                 result.insert(*k, v.min(right_mem));
             }
         }
-        Set::new_with_domain(format!("{} INTERSECT {}", left.name, right.name), RefCell::new(result))
+        Set::new_with_domain(
+            format!("{} INTERSECT {}", left.name, right.name),
+            RefCell::new(result),
+        )
     }
 }
 
@@ -71,12 +76,14 @@ impl LogicOps for ZadehOps {
     ///
     /// Returns minimum of arguments.
     ///
-    /// # Usage
+    /// # Examples
     /// The classical AND operator's truth table:
     ///
     /// ```rust
     /// use fuzzy_logic::ops::{LogicOps, ZadehOps};
+    ///
     /// let ops = ZadehOps{};
+    ///
     /// ops.and(0.0, 0.0); //-> 0.0
     /// ops.and(0.0, 1.0); //-> 0.0
     /// ops.and(1.0, 0.0); //-> 0.0
@@ -90,12 +97,14 @@ impl LogicOps for ZadehOps {
     ///
     /// Returns maximum of arguments.
     ///
-    /// # Usage
+    /// # Examples
     /// The classical OR operator's truth table:
     ///
     /// ```rust
     /// use fuzzy_logic::ops::{LogicOps, ZadehOps};
+    ///
     /// let ops = ZadehOps{};
+    ///
     /// ops.or(0.0, 0.0); //-> 0.0
     /// ops.or(0.0, 1.0); //-> 1.0
     /// ops.or(1.0, 0.0); //-> 1.0
@@ -108,12 +117,14 @@ impl LogicOps for ZadehOps {
     /// Fuzzy logic AND operation.
     ///
     /// Returns inversed logical value.
-    /// # Usage
+    /// # Examples
     /// The classical NOT operator's truth table:
     ///
     /// ```rust
     /// use fuzzy_logic::ops::{LogicOps, ZadehOps};
+    ///
     /// let ops = ZadehOps{};
+    ///
     /// ops.not(0.0); //-> 1.0
     /// ops.not(1.0); //-> 0.0
     /// ```

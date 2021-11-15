@@ -4,10 +4,7 @@
 //! Given as a part of the universal set with the membership function.
 
 use crate::functions::MembershipFunction;
-use std::{
-    cell::RefCell,
-    collections::HashMap, f32, fmt
-};
+use std::{cell::RefCell, collections::HashMap, f32, fmt};
 
 use ordered_float::OrderedFloat;
 
@@ -26,7 +23,7 @@ impl Set {
     /// Don't create sets with this method. Use `UniversalSet`.
     pub fn new_with_mem(name: String, membership: Box<MembershipFunction>) -> Set {
         Set {
-            name: name,
+            name,
             membership: Some(membership),
             cache: RefCell::new(HashMap::new()),
         }
@@ -36,9 +33,9 @@ impl Set {
     /// This cover the cases, where membership function is not available. E.g. result of an operation.
     pub fn new_with_domain(name: String, cache: RefCell<HashMap<OrderedFloat<f32>, f32>>) -> Set {
         Set {
-            name: name,
+            name,
             membership: None,
-            cache: cache,
+            cache,
         }
     }
 
@@ -50,11 +47,10 @@ impl Set {
         let func = self.membership.as_ref();
         let mut cache = self.cache.borrow_mut();
 
-        let value = cache.entry(ordered).or_insert(match func {
+        let mem = *cache.entry(ordered).or_insert(match func {
             Some(f) => f(x),
             None => 0.0,
         });
-        let mem = *value;
      
         if mem <= 0.0 {
             cache.remove(&ordered);
@@ -69,6 +65,7 @@ impl fmt::Debug for Set {
         for (k, v) in self.cache.borrow().iter() {
             s = s + &format!("k:{} v:{}\n", k, v);
         }
+
         write!(f, "Set {{ name: {}\ncache: {} }}", self.name, s)
     }
 }
