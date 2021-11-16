@@ -75,6 +75,7 @@ impl InferenceMachine {
             options: &self.options,
         };
         let result = self.rules.compute_all(&mut context);
+        dbg!(&result);
 
         (result.name.clone(), (*self.options.defuzz_func)(&result))
     }

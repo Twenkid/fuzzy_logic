@@ -39,6 +39,7 @@ fn main() {
 
     let (x_dest, x, pitch_output) = {
         let x_dest = UniversalSet::new("x_dest")
+            .with_domain(vec![-2.0, -1.0, 0.0, 1.0, 2.0])
             .add_set("NB", MembershipFactory::triangular(-2.0, -2.0, -1.0))
             .add_set("NS", MembershipFactory::triangular(-2.0, -1.0, 0.0))
             .add_set("Z", MembershipFactory::triangular(-1.0, 0.0, 1.0))
@@ -46,6 +47,7 @@ fn main() {
             .add_set("PB", MembershipFactory::triangular(1.0, 2.0, 2.0));
 
         let x = UniversalSet::new("x")
+            .with_domain(vec![-2.0, -1.0, 0.0, 1.0, 2.0])
             .add_set("NB", MembershipFactory::triangular(-2.0, -2.0, -1.0))
             .add_set("NS", MembershipFactory::triangular(-2.0, -1.0, 0.0))
             .add_set("Z", MembershipFactory::triangular(-1.0, 0.0, 1.0))
@@ -53,12 +55,14 @@ fn main() {
             .add_set("PB", MembershipFactory::triangular(1.0, 2.0, 2.0));
 
         let pitch_output = UniversalSet::new("pitch_output")
+        .with_domain(vec![-0.5, -0.25, 0.0, 0.25, 0.5])
             .add_set("NB", MembershipFactory::singleton(-0.5))
             .add_set("NS", MembershipFactory::singleton(-0.25))
             .add_set("Z", MembershipFactory::singleton(0.0))
             .add_set("PS", MembershipFactory::singleton(0.25))
             .add_set("PB", MembershipFactory::singleton(0.5));
-        (x_dest, x, pitch_output)
+        
+            (x_dest, x, pitch_output)
     };
 
     let mut universes = HashMap::default();

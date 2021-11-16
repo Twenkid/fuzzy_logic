@@ -92,8 +92,15 @@ impl UniversalSet {
     }
 
     /// Sets the domain of the universal set.
+    #[deprecated = "Use chainable method with_domain()"]
     pub fn set_domain(&mut self, domain: Vec<f32>) {
         self.domain = domain;
+    }
+
+    /// Chain-able method for overriding the `domain` of the universal set
+    pub fn with_domain(mut self, domain: Vec<f32>) -> Self {
+        self.domain = domain;
+        self
     }
 
     /// Constructs the child fuzzy set with given membership.
