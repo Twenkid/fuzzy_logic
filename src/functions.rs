@@ -3,23 +3,25 @@
 //! Module contains implementation of membership functions and defuzzification functions.
 //! Also contains factory methods to create most used functions.
 
-use set::Set;
+use crate::set::Set;
+use num::abs;
 
 /// Used to calculate the membership of the given item.
 /// All membership functions must be this type.
-pub type MembershipFunction = Fn(f32) -> f32;
+pub type MembershipFunction = dyn Fn(f32) -> f32;
 
 /// Used to defuzzificate the fuzzy logic inference result.
 /// All defuzzification functions must be this type.
-pub type DefuzzFunc = Fn(&Set) -> f32;
+pub type DefuzzFunc = dyn Fn(&Set) -> f32;
 
 /// Defines methods to create most used membership functions.
 ///
-/// #Usage
+/// # Examples
 /// Create triangular function:
 ///
 /// ```rust
 /// use fuzzy_logic::functions::MembershipFactory;
+///
 /// let mem = MembershipFactory::triangular(-15.0, -15.0, 22.0);
 /// mem(-15.0); // -> 1.0
 /// ```
@@ -65,16 +67,33 @@ impl MembershipFactory {
     pub fn gaussian(a: f32, b: f32, c: f32) -> Box<MembershipFunction> {
         Box::new(move |x: f32| a * (-1.0 * ((x - b).powi(2) / (2.0 * c.powi(2)))).exp())
     }
+
+    //Debug, Todor, 15.12.2021
+    /// Creates a singleton function
+    // If value == x returns 1.0 (part of the set)
+    // If value != x returns 0.0 (not part of the set)
+    pub fn singleton(value: f32) -> Box<MembershipFunction> {
+        //Box::new(move |x: f32| if value == x { 1.0 } else { 0.0 })
+		let eps = 0.01; //epsilon
+		//Box::new(move |x: f32| if num::abs(value - x) < eps { 1.0 } else { 0.0 })
+		let b = Box::new(move |x: f32| if num::abs(value - x) < eps { 1.0 } else { 0.0 });
+		//That's a closure, x will be known when it's invoked
+		//If
+		//println!("singleton num::abs(value - x)={}, eps={}", num::abs(value - x), eps)
+		b
+    }
 }
 
 /// Defines methods to create most used defuzzification functions.
 ///
-/// #Usage
+/// # Examples
 /// Create function which calculates center of mass:
 ///
 /// ```rust
-/// use fuzzy_logic::functions::{DefuzzFactory, MembershipFactory};
-/// use fuzzy_logic::set::Set;
+/// use fuzzy_logic::{
+///     functions::{DefuzzFactory, MembershipFactory,
+///     set::Set
+/// };
 ///
 /// let mem = MembershipFactory::triangular(-15.0, -15.0, 22.0);
 /// let df = DefuzzFactory::center_of_mass();
@@ -88,7 +107,11 @@ impl DefuzzFactory {
     pub fn center_of_mass() -> Box<DefuzzFunc> {
         Box::new(|s: &Set| {
             let sum = s.cache.borrow().iter().fold(0.0, |acc, (_, &v)| acc + v);
-            let prod_sum = s.cache.borrow().iter().fold(0.0, |acc, (&k, &v)| acc + k.into_inner() * v);
+            let prod_sum = s
+                .cache
+                .borrow()
+                .iter()
+                .fold(0.0, |acc, (&k, &v)| acc + k.into_inner() * v);
             prod_sum / sum
         })
     }
@@ -96,8 +119,8 @@ impl DefuzzFactory {
 
 #[cfg(test)]
 mod test {
-    use std::f32;
     use super::*;
+    use std::f32;
 
     #[test]
     fn sigmoidal() {
@@ -105,7 +128,7 @@ mod test {
         for i in -100..100 {
             let midpoint = i as f32;
             let f = MembershipFactory::sigmoidal(steepness, midpoint);
-            let mut diff = (0.5 - f(midpoint)).abs();
+            let diff = (0.5 - f(midpoint)).abs();
             assert!(diff <= f32::EPSILON);
         }
     }
