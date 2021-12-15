@@ -2,6 +2,9 @@
 
 Debugging examples ... use.rs ...
 Why NaN?
+
+functions.rs singleton ...
+
 15.12.2021
 ...
 
