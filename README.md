@@ -1,3 +1,10 @@
+## Twenkid
+
+Debugging examples ... use.rs ...
+Why NaN?
+15.12.2021
+...
+
 # fuzzy_logic
 Fuzzy logic inference implementation.
 
