@@ -54,6 +54,8 @@ fn main() {
             .add_set("PS", MembershipFactory::triangular(0.0, 1.0, 2.0))
             .add_set("PB", MembershipFactory::triangular(1.0, 2.0, 2.0));
 
+
+        //let pitch_output_singleton = UniversalSet::new("pitch_output")
         let pitch_output = UniversalSet::new("pitch_output")
         .with_domain(vec![-0.5, -0.25, 0.0, 0.25, 0.5])
             .add_set("NB", MembershipFactory::singleton(-0.5))
@@ -61,7 +63,15 @@ fn main() {
             .add_set("Z", MembershipFactory::singleton(0.0))
             .add_set("PS", MembershipFactory::singleton(0.25))
             .add_set("PB", MembershipFactory::singleton(0.5));
-        
+		/*	
+		let pitch_output = UniversalSet::new("pitch_output")
+        .with_domain(vec![-0.5, -0.25, 0.0, 0.25, 0.5])
+            .add_set("NB", MembershipFactory::triangular(-0.5, -0.5, -0.25))
+            .add_set("NS", MembershipFactory::triangular(-0.5, -0.25, 0.0))
+            .add_set("Z", MembershipFactory::triangular(-0.25, 0.0, 0.25))
+            .add_set("PS", MembershipFactory::triangular(0.0, 0.25, 0.5))
+            .add_set("PB", MembershipFactory::triangular(0.25, 0.5, 0.5));
+        */
             (x_dest, x, pitch_output)
     };
 
@@ -82,10 +92,11 @@ fn main() {
 
     let input = vec![
         // NB
-        ("x_dest".into(), -1.9_f32),
+        ("x_dest".into(), -1.9_f32), //-1.9_f32),
+        //("x_dest".into(), -2.0_f32), //-1.9_f32),
         // NS
-        //("x".into(), -1.0_f32),
-		("x".into(), 0.0_f32),
+        ("x".into(), 2.0_f32),
+		//("x".into(), 0.0_f32),
     ]
     .into_iter()
     .collect();
@@ -99,5 +110,7 @@ fn main() {
     // TODO: Check what's going wrong here.
     // value: NaN
     // Actual: Set: pitch_output: Z UNION pitch_output: NS UNION pitch_output: NB UNION pitch_output: NB UNION pitch_output: NB UNION pitch_output: PS UNION pitch_output: Z UNION pitch_output: NS UNION pitch_output: NB UNION pitch_output: NB value: NaN
-    println!("Set: {} value: {}", output.0, output.1)
+    println!("Set: {} value: {}", output.0, output.1);
+	//println!("output.0[output.0.len()-1] {}", output.0[output.0.len()-1])
+	
 }
