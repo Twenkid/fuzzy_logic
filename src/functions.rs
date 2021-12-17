@@ -30,6 +30,18 @@ pub struct MembershipFactory;
 impl MembershipFactory {
     /// Creates triangular function.
     pub fn triangular(a: f32, b: f32, c: f32) -> Box<MembershipFunction> {
+		println!("a,b,c={},{},{}", a,b,c);
+		let mut t = 0.0;
+		let xt = -1.9; //2.0;
+		if a <= xt && xt <= b {
+                t = 1.0 - (b - xt) / (b - a)
+            } else if b <= xt && xt <= c {
+                t = 1.0 - (xt - b) / (c - b)
+            } else {
+                t= 0.0
+            }
+			
+	    println!("Triangular, t == {}", t);
         Box::new(move |x: f32| {
             if a <= x && x <= b {
                 1.0 - (b - x) / (b - a)
@@ -68,15 +80,23 @@ impl MembershipFactory {
         Box::new(move |x: f32| a * (-1.0 * ((x - b).powi(2) / (2.0 * c.powi(2)))).exp())
     }
 
-    //Debug, Todor, 15.12.2021
+   
     /// Creates a singleton function
     // If value == x returns 1.0 (part of the set)
     // If value != x returns 0.0 (not part of the set)
-    pub fn singleton(value: f32) -> Box<MembershipFunction> {
+    pub fn singleton(value: f32) -> Box<MembershipFunction> { 
         //Box::new(move |x: f32| if value == x { 1.0 } else { 0.0 })
-		let eps = 0.01; //epsilon
+		let eps = 0.01; //epsilon   //Debug, Todor, 15.12.2021
 		//Box::new(move |x: f32| if num::abs(value - x) < eps { 1.0 } else { 0.0 })
-		let b = Box::new(move |x: f32| if num::abs(value - x) < eps { 1.0 } else { 0.0 });
+		//let xt = value.clone();
+		//let xt = -1.9/4.0; //-1.9;
+		let xt = -1.9; ///4.0; //-1.9;
+	    let mut t = 0.0;
+		println!("value, xt, value-xt < eps = {},{},{}", value, xt, value-xt < eps);			
+		if num::abs(value - xt) < eps { t = 1.0}; //#{ 1.0 } else { 0.0 };
+		println!("singleton if num::abs(value - xt) < eps 1.0  else 0.0; t = ? [{}]", t);
+		let b = Box::new(move |x: f32| if num::abs(value - x) < eps { 1.0 } else { 0.0 }); //CURRENT
+		//let b = Box::new(move |x: f32| if true { 1.0_f32 } else {1.0_f32}); //Send always 1
 		//That's a closure, x will be known when it's invoked
 		//If
 		//println!("singleton num::abs(value - x)={}, eps={}", num::abs(value - x), eps)

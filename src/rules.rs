@@ -185,6 +185,7 @@ impl Rule {
 
     /// Computes the current rule. Returns the fuzzy set as the result.
     pub fn compute(&self, context: &InferenceContext) -> Set {
+	    dbg!(self, context); //...
         let expression_result = (*self.condition).eval(context);
         let universe = context
             .universes
